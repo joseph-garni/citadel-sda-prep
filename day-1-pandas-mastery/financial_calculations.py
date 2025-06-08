@@ -1,6 +1,18 @@
 '''
 Day 1 - Financial Calculations Practice
 Goal: Master pandas returns and risk calculations in 12 minutes
+
+Setting the Framing:
+
+Goal: Write any of the 6 drills in under 5 minutes from memory
+
+Drill 1 -> Track Daily Performance
+Drill 2 -> Identify Trends and Momentum
+Drill 3 -> Compare Sector Performance
+Drill 4 -> Ensure Data Quality for Analysis
+Drill 5 -> Calculate Investment Risk Metrics
+Drill 6 -> Generate Investment Recommendations
+
 '''
 
 import pandas as pd
@@ -49,4 +61,14 @@ sharpe_ratios = df.groupby('symbol')['daily return'].apply(
 )
 
 print(sharpe_ratios.sort_values(ascending=False))
+
+'''
+Drill 2: Identifying Trends and Momentum 
+
+Implement:
+- Rolling Averages 
+- Rolling Volatility
+'''
+
+
 
