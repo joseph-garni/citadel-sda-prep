@@ -25,7 +25,8 @@ np.random.seed(42)
 
 dates = pd.date_range('2024-01-01', periods=252) # periods in a trading year
 symbols = ['AAPL', 'MSTF', 'GOOGL', 'TSLA', 'NVDA', 'JPM', 'XOM', 'PG']
-sectors = ['Tech', 'Tech', 'Tech', 'Tech', 'Tech', 'Finance', 'Energy', 'Consumer']
+sector = ['Tech', 'Tech', 'Tech', 'Tech', 'Tech', 'Finance', 'Energy', 'Consumer']
+num_shares = ['15000000000', '7410000000', '13100000000', '3200000000', '24000000000', '24600000000', '4370000000', '2480000000']
 
 data = []
 
@@ -39,7 +40,7 @@ for i, symbol in enumerate(symbols):
             'date': date,
             'price': price[j],
             'volume': np.random.randint(10000000, 50000000),
-            'sector': sectors[i]
+            'sector': sector[i]
         })
 
 df = pd.DataFrame(data)
@@ -53,7 +54,6 @@ Drill 1 - Returns Calculations
 df['daily return'] = df.groupby('symbol')['price'].pct_change()
 
 # Best risk-adjusted stocks over the last year (hypothetical):
-
 # We want the equities with the highest sharpe-ratio
 
 sharpe_ratios = df.groupby('symbol')['daily return'].apply(
@@ -77,4 +77,20 @@ drill2['simple moving average (50 days)'] = drill2.groupby('symbol')['price'].ro
 drill2['returns volatility (30 days)'] = drill2.groupby('symbol')['daily return'].rolling(30).std().reset_index(0, drop = True)
 
 print(drill2)
+
+'''
+Drill 3 - Calculating Sector Performance + Comparing Sectors
+
+Implement:
+
+For Each Sector:
+- Average Daily Return
+- Total Market Cap
+- Return Volatility
+- Number of Stocks
+- Best Performing Stock in Each Sector
+
+'''
+
+drill3 = df.copy()
 
