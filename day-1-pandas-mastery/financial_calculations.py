@@ -17,8 +17,10 @@ sectors = ['Tech', 'Tech', 'Tech', 'Tech', 'Tech', 'Finance', 'Energy', 'Consume
 
 data = []
 
+starting_prices = [200, 290, 300, 170, 370, 170, 200, 160]
+
 for i, symbol in enumerate(symbols):
-    price = 100 + np.random.randn(252).cumsum() * 0.02  # 2% daily volatility 
+    price = starting_prices[i] + np.random.randn(252).cumsum() * 0.02 * starting_prices[i]  # 2% daily volatility 
     for j, date in enumerate(dates):
         data.append({
             'symbol':symbol,
@@ -31,3 +33,20 @@ for i, symbol in enumerate(symbols):
 df = pd.DataFrame(data)
 print(f"Created dataset:{df.shape}")
 print(df.head())
+
+'''
+Drill 1 - Returns Calculations
+'''
+
+df['daily return'] = df.groupby('symbol')['price'].pct_change()
+
+# Best risk-adjusted stocks over the last year (hypothetical):
+
+# We want the equities with the highest sharpe-ratio
+
+sharpe_ratios = df.groupby('symbol')['daily return'].apply(
+    lambda x: x.mean() / x.std() if x.std() > 0 else 0
+)
+
+print(sharpe_ratios.sort_values(ascending=False))
+
