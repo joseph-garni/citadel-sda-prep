@@ -40,7 +40,8 @@ for i, symbol in enumerate(symbols):
             'date': date,
             'price': price[j],
             'volume': np.random.randint(10000000, 50000000),
-            'sector': sector[i]
+            'sector': sector[i],
+            'num_shares': num_shares[i]
         })
 
 df = pd.DataFrame(data)
@@ -94,3 +95,7 @@ For Each Sector:
 
 drill3 = df.copy()
 
+#calculating present market cap
+drill3['market cap'] = drill3['price']*drill3['num_shares']
+
+print(drill3)
