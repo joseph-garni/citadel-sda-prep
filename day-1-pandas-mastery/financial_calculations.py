@@ -70,5 +70,11 @@ Implement:
 - Rolling Volatility
 '''
 
+drill2 = df.copy()
 
+drill2['simple moving average (20 days)'] = drill2.groupby('symbol')['price'].rolling(20).mean().reset_index(0, drop = True)
+drill2['simple moving average (50 days)'] = drill2.groupby('symbol')['price'].rolling(50).mean().reset_index(0, drop = True)
+drill2['returns volatility (30 days)'] = drill2.groupby('symbol')['daily return'].rolling(30).std().reset_index(0, drop = True)
+
+print(drill2)
 
