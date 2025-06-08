@@ -38,10 +38,10 @@ for i, symbol in enumerate(symbols):
         data.append({
             'symbol':symbol,
             'date': date,
-            'price': price[j],
-            'volume': np.random.randint(10000000, 50000000),
+            'price': int(price[j]),
+            'volume': int(np.random.randint(10000000, 50000000)),
             'sector': sector[i],
-            'num_shares': num_shares[i]
+            'num_shares': int(num_shares[i])
         })
 
 df = pd.DataFrame(data)
@@ -97,5 +97,6 @@ drill3 = df.copy()
 
 #calculating present market cap
 drill3['market cap'] = drill3['price']*drill3['num_shares']
+drill3['average daily return'] = df.groupby('symbol')['daily return'].fillna(0).mean()
 
 print(drill3)
