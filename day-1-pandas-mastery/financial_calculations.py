@@ -24,16 +24,23 @@ import numpy as np
 np.random.seed(42)
 
 dates = pd.date_range('2024-01-01', periods=252) # periods in a trading year
-symbols = ['AAPL', 'MSTF', 'GOOGL', 'TSLA', 'NVDA', 'JPM', 'XOM', 'PG']
-sector = ['Tech', 'Tech', 'Tech', 'Tech', 'Tech', 'Finance', 'Energy', 'Consumer']
-num_shares = ['15000000000', '7410000000', '13100000000', '3200000000', '24000000000', '24600000000', '4370000000', '2480000000']
+symbols = ['AAPL', 'MSTF', 'GOOGL', 'TSLA', 'NVDA', 'JPM', 'XOM', 'PG', 'XLR', 'BP', 'GS']
+sector = ['Tech', 'Tech', 'Tech', 'Tech', 'Tech', 'Finance', 'Energy', 'Consumer', 'Consumer', 'Energy', 'Finance']
+num_shares = ['15000000000', '7410000000', '13100000000', '3200000000', '24000000000', '24600000000', '4370000000', '2480000000', '1180000000', '4200000000']
 
 data = []
 
 starting_prices = [200, 290, 300, 170, 370, 170, 200, 160]
 
 for i, symbol in enumerate(symbols):
-    price = starting_prices[i] + np.random.randn(252).cumsum() * 0.02 * starting_prices[i]  # 2% daily volatility 
+
+    # More realistic - uses multiplicative returns
+    dt = 1/252  # daily time step
+    mu = 0.08   # annual drift
+    sigma = 0.20  # annual volatility
+
+    returns = np.random.normal(mu * dt, sigma * np.sqrt(dt), 252)
+    price = starting_prices[i] * np.exp(np.cumsum(returns))
     for j, date in enumerate(dates):
         data.append({
             'symbol':symbol,
@@ -106,6 +113,7 @@ sector_stats.columns = ['symbol', 'average return', 'return volatility', 'tradin
 # add sector and current market cap info
 sector_stats = sector_stats.merge(latest_data[['symbol', 'sector', 'current market cap', 'volume']], on = 'symbol')
 
+# aggregating sector metrics together in one data frame - sector metrics + rounding to 4 dp
 sector_metrics = sector_stats.groupby('symbol').agg({
     'average return': 'mean',
     'return volatility': 'std',
@@ -114,6 +122,11 @@ sector_metrics = sector_stats.groupby('symbol').agg({
     'volume': 'mean',
     'trading days': 'mean'
 }).round(4)
+
+# renaming sector columns for clarity
+sector_metrics.columns = ['average sector returns', 'average return volatility', 'market cap', 'num stocks', 'average volume', 'average trading days']
+
+# return best stocks
 
 print(drill3)
     
