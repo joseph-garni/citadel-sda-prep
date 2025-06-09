@@ -18,12 +18,18 @@ Drill 6 -> Generate Investment Recommendations
 import pandas as pd
 import numpy as np
 
+# UK Trading days
+
+import yfinance as yf
+
+from pandas.tseries.holiday import UKHolidays
+
 # Part 1
 # Create realistic Sample Data:
 
 np.random.seed(42)
 
-dates = pd.bdate_range('2024-01-01', periods=252) # periods in a trading year
+dates = pd.bdate_range('2024-01-01', periods=252, holidays=UKHolidays)
 symbols = ['AAPL', 'MSTF', 'GOOGL', 'TSLA', 'NVDA', 'JPM', 'XOM', 'PG', 'XLR', 'BP', 'GS']
 sector = ['Tech', 'Tech', 'Tech', 'Tech', 'Tech', 'Finance', 'Energy', 'Consumer', 'Consumer', 'Energy', 'Finance']
 num_shares = ['15000000000', '7410000000', '13100000000', '3200000000', '24000000000', '24600000000', '4370000000', '2480000000', '1180000000', '4200000000', '1100000000']
@@ -210,7 +216,6 @@ drawdown = (cumulative - rolling_max) / rolling_max
 max_drawdown = drawdown.min()
 
 # using yfinance for beta calculations
-import yfinance as yf
 
 # downloading S&P 500 data - common market bench
 
