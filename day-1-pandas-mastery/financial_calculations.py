@@ -99,4 +99,44 @@ drill3 = df.copy()
 drill3['market cap'] = drill3['price']*drill3['num_shares']
 drill3['average daily return'] = df.groupby('symbol')['daily return'].fillna(0).mean()
 
+# .agg(['mean', 'std', 'count']) automatically automatically maps these strings to the corresponding methods
+sector_stats = drill3.groupby('symbol')['daily return'].agg(['mean', 'std', 'count']).reset_index()
+sector_stats.columns = ['symbol', 'average return', 'return volatility', 'trading days']
+
+# add sector and current market cap info
+sector_stats = sector_stats.merge(latest_data[['symbol', 'sector', 'current market cap', 'volume']], on = 'symbol')
+
+sector_metrics = sector_stats.groupby('symbol').agg({
+    'average return': 'mean',
+    'return volatility': 'std',
+    'current market cap': 'sum',
+    'symbol': 'count',
+    'volume': 'mean',
+    'trading days': 'mean'
+}).round(4)
+
 print(drill3)
+    
+    # Step 4: Aggregate by sector
+    sector_metrics = symbol_stats.groupby('sector').agg({
+        'avg_return': 'mean',           # Average return across stocks in sector
+        'return_volatility': 'mean',    # Average volatility across stocks in sector  
+        'current_market_cap': 'sum',    # Total sector market cap
+        'symbol': 'count',              # Number of stocks in sector
+        'volume': 'mean',               # Average volume across stocks in sector
+        'trading_days': 'mean'          # Average trading days
+    }).round(4)
+    
+    # Rename columns for clarity
+    sector_metrics.columns = ['avg_sector_return', 'avg_volatility', 'total_market_cap', 
+                             'num_stocks', 'avg_volume', 'avg_trading_days']
+    
+    # Step 5: Find best performer in each sector
+    best_performers = symbol_stats.loc[symbol_stats.groupby('sector')['avg_return'].idxmax()]
+    best_performers = best_performers[['sector', 'symbol', 'avg_return']].rename(
+        columns={'symbol': 'best_stock', 'avg_return': 'best_stock_return'}
+    )
+    
+    # Step 6: Combine results
+    sector_metrics = sector_metrics.reset_index()
+    sector_metrics = sector_metrics.merge(best_performers, on='sector')
