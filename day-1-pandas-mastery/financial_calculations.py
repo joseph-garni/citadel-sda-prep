@@ -22,14 +22,16 @@ import numpy as np
 
 import yfinance as yf
 
-from pandas.tseries.holiday import UKHolidays
+import holidays
+
+uk_holidays = holidays.UK()
 
 # Part 1
 # Create realistic Sample Data:
 
 np.random.seed(42)
 
-dates = pd.bdate_range('2024-01-01', periods=252, holidays=UKHolidays)
+dates = pd.bdate_range('2024-01-01', periods=252, holidays=uk_holidays)
 symbols = ['AAPL', 'MSTF', 'GOOGL', 'TSLA', 'NVDA', 'JPM', 'XOM', 'PG', 'XLR', 'BP', 'GS']
 sector = ['Tech', 'Tech', 'Tech', 'Tech', 'Tech', 'Finance', 'Energy', 'Consumer', 'Consumer', 'Energy', 'Finance']
 num_shares = ['15000000000', '7410000000', '13100000000', '3200000000', '24000000000', '24600000000', '4370000000', '2480000000', '1180000000', '4200000000', '1100000000']
@@ -178,6 +180,7 @@ drill4['date'] = pd.to_datetime(drill4['date'])
 drill4['price'] = pd.to_numeric(drill4['price'], errors='coerce')
 drill4['volume'] = pd.to_numeric(drill4['volume'], errors='coerce')
 drill4['daily return'] = pd.to_numeric(drill4['daily return'], errors='coerce')
+drill4['price']
 
 # use dropna, subset to not remove any rows that do not include price, volume, or num shares data
 drill4 = drill4.dropna(subset=['price', 'volume', 'num_shares'])
@@ -196,6 +199,8 @@ Implement:
 - maximum drawdown
 - beta (Correlation to the market)
 - annualised return and volatility
+
+'''
 
 '''
 
@@ -219,4 +224,61 @@ max_drawdown = drawdown.min()
 
 # downloading S&P 500 data - common market bench
 
-market_data = yf.download('^GSPC', start='2024-01-01', end='2025-01-01')
+sp500_data = yf.download('^GSPC', start='2024-01-01', end='2025-01-01')
+sp500_data['daily market return'] = sp500_data['Close'].pct_change() # calculating daily sp500 returns
+market_return = sp500_data['daily market return'].dropna()
+
+beta = np.cov(returns,  market_return)[0, 1] / np.var(market_return) if np.var(market_return) > 0 else 0
+
+# annualised returns
+annualised_return = returns.mean() * 252
+annualised_volatility = returns.std() * np.sqrt(252)
+
+metrics = pd.Series([sharpe_ratio, max_drawdown, beta, annualised_return, annualised_volatility, len(returns)])
+
+print(metrics)
+'''
+
+# come back to drill 5 for pandas data frame integration - actual calculations make sense
+
+'''
+Drill 6 - Investment Screening and Ranking
+
+Implements:
+
+- Generate actionable investment ideas / decisions by screening stocks for:
+
+- Strong momentum (20-day return > sector average)
+- Good risk adjusted returns (sharpe-ratio > 1.0)
+- Reasonable volatility (not in top 20% volatile stocks)
+- Recent outperformance (last 30 days vs sector)
+- Rank final candidates by combined score
+
+This is meant to be what Citadel Sector Analysts do daily!
+
+Scoring:
+40% - risk adjusted returns (sharpe-ratio)
+30% - momentum
+20% - recent return
+10% - (negative) volatility
+
+'''
+
+import yfinance as yf
+import pandas as pd
+import numpy as np
+
+from datetime import datetime
+
+# defining our 15 stocks across 5 sectors (3 each)
+
+stocks = {
+    'Technology': ['APPL', 'GOOGL', 'MSFT'],
+    'Healthcare': ['JNJ', 'PFE', 'UNH'],
+    'Financial': ['JPM', 'BAC', 'WFC'],
+    'Consumer Discretionary': ['AMAZ', 'TSLA', 'HD'],
+    'Energy': ['XOM', 'CVX', 'COP']
+    }
+
+all_tickers = [ticker for sector_stocks in stocks.values() for ticker in sector_stocks]
+
