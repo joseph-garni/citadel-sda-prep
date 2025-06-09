@@ -127,29 +127,14 @@ sector_metrics = sector_stats.groupby('symbol').agg({
 sector_metrics.columns = ['average sector returns', 'average return volatility', 'market cap', 'num stocks', 'average volume', 'average trading days']
 
 # return best stocks
+best_performers = symbol_stats.loc[symbol_stats.groupby('sector')['average return'].idxmax()]
+best_performers = best_performers[['sector', 'symbol', 'average return']].rename(
+    columns={'symbol': 'best stock', 'average return': 'best stock return'}
+)
 
-print(drill3)
+# combine returns for top performing stock + sector level metrics into one
+sector_metrics = sector_metrics.reset_index()
+sector_metrics = sector_metrics.merge(best_performs, on='sector')
+
+print(sector_metrics)
     
-    # Step 4: Aggregate by sector
-    sector_metrics = symbol_stats.groupby('sector').agg({
-        'avg_return': 'mean',           # Average return across stocks in sector
-        'return_volatility': 'mean',    # Average volatility across stocks in sector  
-        'current_market_cap': 'sum',    # Total sector market cap
-        'symbol': 'count',              # Number of stocks in sector
-        'volume': 'mean',               # Average volume across stocks in sector
-        'trading_days': 'mean'          # Average trading days
-    }).round(4)
-    
-    # Rename columns for clarity
-    sector_metrics.columns = ['avg_sector_return', 'avg_volatility', 'total_market_cap', 
-                             'num_stocks', 'avg_volume', 'avg_trading_days']
-    
-    # Step 5: Find best performer in each sector
-    best_performers = symbol_stats.loc[symbol_stats.groupby('sector')['avg_return'].idxmax()]
-    best_performers = best_performers[['sector', 'symbol', 'avg_return']].rename(
-        columns={'symbol': 'best_stock', 'avg_return': 'best_stock_return'}
-    )
-    
-    # Step 6: Combine results
-    sector_metrics = sector_metrics.reset_index()
-    sector_metrics = sector_metrics.merge(best_performers, on='sector')
