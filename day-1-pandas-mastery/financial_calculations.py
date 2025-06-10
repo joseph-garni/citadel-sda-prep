@@ -273,12 +273,18 @@ from datetime import datetime
 # defining our 15 stocks across 5 sectors (3 each)
 
 stocks = {
-    'Technology': ['APPL', 'GOOGL', 'MSFT'],
+    'Technology': ['AAPL', 'GOOGL', 'MSFT'],
     'Healthcare': ['JNJ', 'PFE', 'UNH'],
     'Financial': ['JPM', 'BAC', 'WFC'],
-    'Consumer Discretionary': ['AMAZ', 'TSLA', 'HD'],
+    'Consumer Discretionary': ['AMZN', 'TSLA', 'HD'],
     'Energy': ['XOM', 'CVX', 'COP']
     }
 
 all_tickers = [ticker for sector_stocks in stocks.values() for ticker in sector_stocks]
 
+start_date = '2024-01-01'
+end_date = '2024-12-31'
+
+stock_data = yf.download(all_tickers, start = start_date, end = end_date, group_by='ticker')
+
+print(stock_data)
