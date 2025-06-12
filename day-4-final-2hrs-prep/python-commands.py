@@ -19,3 +19,19 @@ df['total return to present'] = ( df.groupby('symbol')['price'].last() / df.grou
 df['sma_20'] = df.groupby('symbol')['price'].rolling(20).mean()
 df['volatility'] = df.groupby('symbol')['daily_return'].rolling(20).std()
 
+# reset index after rolling with groupby
+df['sma_20'] = df.groupby('symbol')['price'].rolling(20).mean().reset_index(0, drop=True)
+
+# SECTOR AGGREGATION
+
+#sector performance metrics
+
+sector_stats = df.groupby('sector').agg(
+    {'daily_return': ['mean', 'std', 'count'], 
+     'market_cap' : 'sum', 
+     'volume': 'mean'}
+     )
+
+# flatten column names 
+
+sector_stats.columns = ['avg_return', 'volatility', 'observations', 'total_mcap', 'avg_volume']
