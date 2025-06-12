@@ -64,6 +64,30 @@ max_dd = (cumulative / cumulative.cummax() - 1).min()
 
 beta = np.cov(stock_returns, market_returns)[0, 1] / np.var(market_returns)
 
+# DATA CLEANING
+
+# handling missing values
+
+df['price'] = pd.to_numeric(df['price'], errors='coerce')
+df = df.dropna(subset=['price', 'volume']) # this drops rows that do not have both price and volume filled in their column values
 
 
+# removing outliers
+
+df = df[df['daily_returns'].abs() < 0.20] # remove > 20 % moves
+
+# date conversion
+
+df['date'] = pd.to_datetime(df['date'])
+
+# TOP / BOTTOM SELECTION
+
+# return top performers by sector
+
+top_by_sector = df.groupby('sector').apply(lambda x: x.nlargest(3, 'return'))
+
+# use nlargest/nsmallest
+
+top_stocks = df.nlargest(10, 'total_return')
+worst_stocks = df.nsmallest(5, 'sharpe_ratio')
 
