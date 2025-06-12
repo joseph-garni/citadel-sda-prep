@@ -35,3 +35,35 @@ sector_stats = df.groupby('sector').agg(
 # flatten column names 
 
 sector_stats.columns = ['avg_return', 'volatility', 'observations', 'total_mcap', 'avg_volume']
+
+# FINANCIAL CALCULATIONS
+
+# SHARPE RATIO
+
+def sharpe_ratio(returns, risk_free=0.02):
+    excess = returns - risk_free/252
+    return excess.mean() / returns.std() * np.sqrt(252)
+
+# pretty easy, returns of stock minus risk free rate divided by total num of trading days 
+# i.e trading period then return the mean of the excees divided 
+# by the standard deviation of the returns multiplied by the sqrt 
+# of 252
+
+# MAX DRAWDOWN
+
+cumulative = ( 1 + returns).cumprod()
+max_dd = (cumulative / cumulative.cummax() - 1).min()
+
+# BETA CALCULATIONS (returns used are the same)
+
+# BETA CALCULATIONS are used to understand underlying volatility of 
+# stock returns relative to market returns (uses variance)
+# Beta greater than 1 = stock returns are more volatile than the market index (i.e S&P 500)
+# Equal means Returns = S&P (exact same metrics i.e volatility / std)
+# Less than 1 means less volatile
+
+beta = np.cov(stock_returns, market_returns)[0, 1] / np.var(market_returns)
+
+
+
+
