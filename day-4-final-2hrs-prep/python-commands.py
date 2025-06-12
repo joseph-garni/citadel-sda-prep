@@ -91,3 +91,5 @@ top_by_sector = df.groupby('sector').apply(lambda x: x.nlargest(3, 'return'))
 top_stocks = df.nlargest(10, 'total_return')
 worst_stocks = df.nsmallest(5, 'sharpe_ratio')
 
+# PANDAS DRILL COMPLETE
+
